@@ -1,1 +1,0 @@
-select * from read_parquet('az://silver/bash_commands/*/*.parquet', hive_partitioning = true)

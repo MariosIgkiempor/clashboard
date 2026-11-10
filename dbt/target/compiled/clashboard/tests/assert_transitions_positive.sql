@@ -1,1 +1,0 @@
-select * from "clashboard"."main"."tool_transitions" where n <= 0 or from_tool is null or to_tool is null

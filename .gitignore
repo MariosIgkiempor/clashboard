@@ -3,3 +3,12 @@ data/
 .env
 .dagster_home/
 .tmp_dagster_home_*/
+
+# generated
+dbt/target/
+dbt/logs/
+dbt/.user.yml
+__pycache__/
+node_modules/
+*.duckdb
+*.duckdb.wal
