@@ -1,0 +1,1 @@
+select * from read_parquet('az://silver/messages/*/*.parquet', hive_partitioning = true)

@@ -1,0 +1,13 @@
+version: 2
+models:
+  - name: stg_messages
+    columns:
+      - name: message_id
+        data_tests: [unique, not_null]
+      - name: model
+        data_tests:
+          - relationships: {to: ref('prices'), field: model}
+  - name: stg_tool_calls
+    columns:
+      - name: tool_use_id
+        data_tests: [unique, not_null]

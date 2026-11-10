@@ -1,0 +1,10 @@
+name: clashboard
+version: '1.0'
+profile: clashboard
+model-paths: [models]
+seed-paths: [seeds]
+models:
+  clashboard:
+    staging: {+materialized: view}
+    intermediate: {+materialized: view}
+    gold: {+materialized: table}

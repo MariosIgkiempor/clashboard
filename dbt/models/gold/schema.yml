@@ -1,0 +1,38 @@
+version: 2
+models:
+  - name: daily_trends
+    columns:
+      - name: day
+        data_tests: [not_null]
+  - name: session_summary
+    columns:
+      - name: session_id
+        data_tests: [unique, not_null]
+  - name: project_summary
+    columns:
+      - name: project
+        data_tests: [not_null]
+  - name: tool_latency
+    columns:
+      - name: tool_name
+        data_tests: [not_null]
+  - name: bash_command_log
+    columns:
+      - name: tool_use_id
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments: {to: ref('stg_tool_calls'), field: tool_use_id}
+      - name: command_family
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['version control', 'search & read', 'files & archives', 'build & packages',
+                         'run & test', 'shell', 'network', 'containers & cloud', 'data', 'dev tools',
+                         'project scripts', 'other']
+  - name: bash_command_stats
+    columns:
+      - name: calls
+        data_tests:
+          - not_null

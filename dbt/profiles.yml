@@ -1,0 +1,10 @@
+clashboard:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "{{ env_var('CLASHBOARD_DATA_DIR', '../data') }}/clashboard.duckdb"
+      extensions: [azure]
+      secrets:
+        - type: azure
+          connection_string: "{{ env_var('AZURE_STORAGE_CONNECTION_STRING') }}"

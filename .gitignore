@@ -1,0 +1,5 @@
+data/
+.venv/
+.env
+.dagster_home/
+.tmp_dagster_home_*/

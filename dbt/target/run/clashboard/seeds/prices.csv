@@ -1,0 +1,13 @@
+
+    
+    
+    
+    create table "clashboard"."main"."prices" ("model" text,"input_per_mtok" float8,"output_per_mtok" float8,"cache_read_per_mtok" float8,"cache_write_per_mtok" float8)
+  ;
+    -- dbt seed --
+    
+          COPY "clashboard"."main"."prices" FROM '/Users/mario/Programming/personal/clashboard/dbt/seeds/prices.csv' (FORMAT CSV, HEADER TRUE, DELIMITER ',')
+        
+
+;
+  

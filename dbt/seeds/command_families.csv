@@ -1,0 +1,156 @@
+command_head,command_family,has_subcommand
+git,version control,true
+gh,version control,true
+jj,version control,true
+grep,search & read,false
+rg,search & read,false
+find,search & read,false
+ls,search & read,false
+cat,search & read,false
+head,search & read,false
+tail,search & read,false
+sed,search & read,false
+awk,search & read,false
+wc,search & read,false
+tree,search & read,false
+fd,search & read,false
+jq,search & read,false
+sort,search & read,false
+uniq,search & read,false
+cut,search & read,false
+tr,search & read,false
+xxd,search & read,false
+file,search & read,false
+stat,search & read,false
+du,search & read,false
+df,search & read,false
+diff,search & read,false
+less,search & read,false
+column,search & read,false
+basename,search & read,false
+dirname,search & read,false
+realpath,search & read,false
+readlink,search & read,false
+which,search & read,false
+strings,search & read,false
+nl,search & read,false
+mkdir,files & archives,false
+rm,files & archives,false
+cp,files & archives,false
+mv,files & archives,false
+touch,files & archives,false
+chmod,files & archives,false
+chown,files & archives,false
+ln,files & archives,false
+rsync,files & archives,false
+tar,files & archives,false
+unzip,files & archives,false
+zip,files & archives,false
+mktemp,files & archives,false
+npm,build & packages,true
+pnpm,build & packages,true
+yarn,build & packages,true
+bun,build & packages,true
+npx,build & packages,false
+pip,build & packages,true
+pip3,build & packages,true
+uv,build & packages,true
+uvx,build & packages,false
+cargo,build & packages,true
+go,build & packages,true
+make,build & packages,true
+odin,build & packages,true
+composer,build & packages,true
+brew,build & packages,true
+gradle,build & packages,true
+mvn,build & packages,true
+cmake,build & packages,false
+tsc,build & packages,false
+vite,build & packages,false
+python,run & test,false
+python3,run & test,false
+node,run & test,false
+php,run & test,true
+ruby,run & test,false
+pytest,run & test,false
+phpunit,run & test,false
+vitest,run & test,false
+jest,run & test,false
+playwright,run & test,true
+bash,run & test,false
+sh,run & test,false
+zsh,run & test,false
+cd,shell,false
+echo,shell,false
+export,shell,false
+set,shell,false
+printf,shell,false
+sleep,shell,false
+true,shell,false
+false,shell,false
+test,shell,false
+[,shell,false
+source,shell,false
+.,shell,false
+eval,shell,false
+exit,shell,false
+read,shell,false
+wait,shell,false
+kill,shell,false
+pkill,shell,false
+ps,shell,false
+lsof,shell,false
+unset,shell,false
+alias,shell,false
+type,shell,false
+command,shell,false
+date,shell,false
+timeout,shell,false
+xargs,shell,false
+tee,shell,false
+pwd,shell,false
+open,shell,false
+pbcopy,shell,false
+pbpaste,shell,false
+curl,network,false
+wget,network,false
+ssh,network,false
+scp,network,false
+ping,network,false
+dig,network,false
+nc,network,false
+docker,containers & cloud,true
+docker-compose,containers & cloud,true
+kubectl,containers & cloud,true
+az,containers & cloud,true
+aws,containers & cloud,true
+gcloud,containers & cloud,true
+terraform,containers & cloud,true
+vercel,containers & cloud,true
+duckdb,data,false
+dbt,data,true
+sqlite3,data,false
+psql,data,false
+mysql,data,false
+mysqldump,data,false
+redis-cli,data,false
+dagster,dev tools,true
+dg,dev tools,true
+streamlit,dev tools,true
+claude,dev tools,true
+rex,dev tools,true
+for,shell,false
+while,shell,false
+until,shell,false
+if,shell,false
+case,shell,false
+pgrep,shell,false
+killall,shell,false
+uptime,shell,false
+uname,shell,false
+whoami,shell,false
+hostname,shell,false
+top,shell,false
+perl,run & test,false
+mysqld,data,false
+mysqladmin,data,false

@@ -1,0 +1,13 @@
+
+    
+    
+    
+    create table "clashboard"."main"."command_families" ("command_head" text,"command_family" text,"has_subcommand" boolean)
+  ;
+    -- dbt seed --
+    
+          COPY "clashboard"."main"."command_families" FROM '/Users/mario/Programming/personal/clashboard/dbt/seeds/command_families.csv' (FORMAT CSV, HEADER TRUE, DELIMITER ',')
+        
+
+;
+  
