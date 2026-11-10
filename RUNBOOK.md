@@ -126,7 +126,7 @@ Bronze only re-uploads what still exists in `~/.claude/projects`. Claude Code de
 
 ## 7. Dagster (orchestration)
 
-Start it (from the repo root; `.env` supplies `STORAGE_MODE`, the Azurite connection string and `DAGSTER_HOME`):
+Start it (from the repo root; `.env` supplies `STORAGE_MODE`, the Azurite connection string; `scripts/start.sh` sets `DAGSTER_HOME` and `CLASHBOARD_DATA_DIR` from the checkout path):
 
 ```bash
 cd orchestration && uv run dg dev          # UI at http://localhost:3000

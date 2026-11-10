@@ -17,10 +17,14 @@ die() { echo "ERROR: $*" >&2; exit 1; }
 command -v uv >/dev/null || die "uv not installed (https://docs.astral.sh/uv/)"
 command -v docker >/dev/null || die "docker not installed"
 docker info >/dev/null 2>&1 || die "docker daemon not running; start Docker Desktop"
-[[ -f .env ]] || die ".env missing (needs AZURE_STORAGE_CONNECTION_STRING, STORAGE_MODE, CLASHBOARD_DATA_DIR, DAGSTER_HOME)"
+[[ -f .env ]] || die ".env missing (needs AZURE_STORAGE_CONNECTION_STRING and STORAGE_MODE; see .env.example)"
 
 set -a; source .env; set +a   # dbt does not read .env itself
-mkdir -p data/azurite "${DAGSTER_HOME:-.dagster_home}"
+# Machine-specific paths are always derived from the checkout location, never from .env, so the same
+# .env (or a copy from another machine with different absolute paths) works anywhere.
+export CLASHBOARD_DATA_DIR="$ROOT/data"
+export DAGSTER_HOME="$ROOT/.dagster_home"
+mkdir -p data/azurite "$DAGSTER_HOME"
 
 # --- python deps -------------------------------------------------------------
 echo "==> uv sync (root + orchestration)"
