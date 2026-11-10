@@ -68,13 +68,26 @@ if [[ $BOOTSTRAP -eq 1 ]]; then
 fi
 
 # --- servers -----------------------------------------------------------------
+# Each server runs in its own process group (set -m) so shutdown can signal the whole tree
+# (uv -> dagster -> daemon/code server, streamlit workers). A bare `kill $pid; wait` hangs
+# forever if any descendant ignores SIGTERM.
+set -m
 PIDS=()
 cleanup() {
+  trap - INT TERM EXIT
   echo; echo "==> stopping servers"
-  for p in "${PIDS[@]:-}"; do [[ -n "$p" ]] && kill "$p" 2>/dev/null || true; done
+  for p in "${PIDS[@]:-}"; do [[ -n "$p" ]] && kill -TERM -- "-$p" 2>/dev/null || true; done
+  for _ in $(seq 1 20); do   # up to 10 s for a graceful stop
+    alive=0
+    for p in "${PIDS[@]:-}"; do [[ -n "$p" ]] && kill -0 -- "-$p" 2>/dev/null && alive=1; done
+    [[ $alive -eq 0 ]] && break
+    sleep 0.5
+  done
+  for p in "${PIDS[@]:-}"; do [[ -n "$p" ]] && kill -KILL -- "-$p" 2>/dev/null || true; done
   wait 2>/dev/null || true
 }
-trap cleanup INT TERM EXIT
+trap cleanup EXIT
+trap 'exit 130' INT TERM
 
 echo "==> refreshing dagster dbt defs"
 (cd orchestration && uv run dg utils refresh-defs-state) || echo "warn: refresh-defs-state failed"
