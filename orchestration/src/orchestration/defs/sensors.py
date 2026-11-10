@@ -3,6 +3,8 @@ from pathlib import Path
 import dagster as dg
 
 SOURCE = Path.home() / ".claude" / "projects"
+# Transcripts rsynced from other machines (see scripts/push_to_hefty.sh); same path as scripts/sync_bronze.py.
+REMOTE = Path(__file__).resolve().parents[4] / "data" / "bronze_remote"
 IN_PROGRESS = [
     dg.DagsterRunStatus.QUEUED,
     dg.DagsterRunStatus.NOT_STARTED,
@@ -18,7 +20,7 @@ IN_PROGRESS = [
 )
 def new_transcripts(context: dg.SensorEvaluationContext):
     """Start a refresh when any transcript has changed since the last run we triggered."""
-    newest = max((p.stat().st_mtime for p in SOURCE.rglob("*.jsonl")), default=0.0)
+    newest = max((p.stat().st_mtime for root in (SOURCE, REMOTE) for p in root.rglob("*.jsonl")), default=0.0)
     if newest <= float(context.cursor or 0):
         return dg.SkipReason("no new transcript data")
 

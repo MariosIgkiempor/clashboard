@@ -36,7 +36,7 @@ if [[ "${STORAGE_MODE:-local}" == "azurite" ]]; then
     docker start azurite >/dev/null
   else
     echo "==> creating azurite"
-    docker run -d --name azurite -p 10000:10000 -v "$ROOT/data/azurite:/data" \
+    docker run -d --name azurite --restart unless-stopped -p 127.0.0.1:10000:10000 -v "$ROOT/data/azurite:/data" \
       mcr.microsoft.com/azure-storage/azurite azurite-blob \
       --blobHost 0.0.0.0 --location /data --skipApiVersionCheck >/dev/null
   fi
@@ -76,11 +76,11 @@ echo "==> refreshing dagster dbt defs"
 (cd orchestration && uv run dg utils refresh-defs-state) || echo "warn: refresh-defs-state failed"
 
 echo "==> dagster  -> http://localhost:3000"
-(cd orchestration && exec uv run dg dev) &
+(cd orchestration && exec uv run dg dev --host 127.0.0.1) &
 PIDS+=($!)
 
 echo "==> streamlit -> http://localhost:8501"
-uv run streamlit run app/dashboard.py --server.headless true &
+uv run streamlit run app/dashboard.py --server.headless true --server.address 127.0.0.1 &
 PIDS+=($!)
 
 wait
