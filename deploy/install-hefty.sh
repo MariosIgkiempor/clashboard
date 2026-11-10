@@ -31,6 +31,24 @@ PL
 launchctl bootout "gui/$UID/$LABEL" 2>/dev/null || true
 launchctl bootstrap "gui/$UID" "$PLIST"
 
+# Pull MacBook transcripts every 15 minutes (silently skipped while the MacBook is asleep/offline).
+PULL_LABEL=com.clashboard.pull
+PULL_PLIST="$HOME/Library/LaunchAgents/$PULL_LABEL.plist"
+cat > "$PULL_PLIST" <<PL
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>Label</key><string>$PULL_LABEL</string>
+  <key>ProgramArguments</key><array><string>$ROOT/scripts/pull_from_macbook.sh</string></array>
+  <key>StartInterval</key><integer>900</integer>
+  <key>RunAtLoad</key><true/>
+  <key>StandardOutPath</key><string>$HOME/Library/Logs/clashboard/pull.log</string>
+  <key>StandardErrorPath</key><string>$HOME/Library/Logs/clashboard/pull.log</string>
+</dict></plist>
+PL
+launchctl bootout "gui/$UID/$PULL_LABEL" 2>/dev/null || true
+launchctl bootstrap "gui/$UID" "$PULL_PLIST"
+
 tailscale serve --bg --https=8501 http://127.0.0.1:8501
 tailscale serve --bg --https=3000 http://127.0.0.1:3000
 tailscale serve status

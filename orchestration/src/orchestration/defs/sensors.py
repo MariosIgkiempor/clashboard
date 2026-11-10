@@ -3,7 +3,7 @@ from pathlib import Path
 import dagster as dg
 
 SOURCE = Path.home() / ".claude" / "projects"
-# Transcripts rsynced from other machines (see scripts/push_to_hefty.sh); same path as scripts/sync_bronze.py.
+# Transcripts rsynced from other machines (see scripts/pull_from_macbook.sh); same path as scripts/sync_bronze.py.
 REMOTE = Path(__file__).resolve().parents[4] / "data" / "bronze_remote"
 IN_PROGRESS = [
     dg.DagsterRunStatus.QUEUED,
