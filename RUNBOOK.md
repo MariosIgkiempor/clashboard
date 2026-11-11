@@ -138,7 +138,7 @@ cd orchestration && uv run dg dev          # UI at http://localhost:3000
 | Graph is right | UI > Assets > lineage | bronze -> silver_messages / silver_tool_calls -> stg_* -> gold -> gold_parquet_export |
 | Manual run | UI > Assets > Materialize all (about 35 s) | all steps green; then `uv run python scripts/verify.py` passes |
 | Sensor works | UI > Automation > `new_transcripts` is ON; use Claude Code, wait up to 5 min | a `full_refresh` run tagged `dagster/sensor_name: new_transcripts`; otherwise ticks say "no new transcript data" |
-| Schedule exists | UI > Automation > `nightly_refresh` is ON | next tick 03:00 Europe/London |
+| Schedule exists | UI > Automation > `nightly_refresh` is ON | next tick 03:00 in `TIMEZONE` (default UTC) |
 | History persists | stop and restart `dg dev` | old runs still listed (stored in `.dagster_home/`) |
 
 After editing anything in `dbt/`: `cd orchestration && uv run dg utils refresh-defs-state` (the dbt component works from a cached copy).

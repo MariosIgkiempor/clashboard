@@ -1,7 +1,7 @@
 -- When do you work? Main-conversation messages by weekday and hour (display timezone).
 with t as (
     select machine,
-           timezone('{{ var("display_timezone", "Europe/London") }}', ts) as local_ts,
+           timezone('{{ var("display_timezone", env_var("TIMEZONE", "UTC")) }}', ts) as local_ts,
            output_tokens
     from {{ ref('int_message_costs') }}
     where not is_sidechain

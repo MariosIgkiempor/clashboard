@@ -92,12 +92,12 @@ trap 'exit 130' INT TERM
 echo "==> refreshing dagster dbt defs"
 (cd orchestration && uv run dg utils refresh-defs-state) || echo "warn: refresh-defs-state failed"
 
-echo "==> dagster  -> http://localhost:3000"
-(cd orchestration && exec uv run dg dev --host 127.0.0.1) &
+echo "==> dagster  -> http://localhost:${DAGSTER_PORT:-3000}"
+(cd orchestration && exec uv run dg dev --host 127.0.0.1 --port "${DAGSTER_PORT:-3000}") &
 PIDS+=($!)
 
-echo "==> streamlit -> http://localhost:8501"
-uv run streamlit run app/dashboard.py --server.headless true --server.address 127.0.0.1 &
+echo "==> streamlit -> http://localhost:${DASHBOARD_PORT:-8501}"
+uv run streamlit run app/dashboard.py --server.headless true --server.address 127.0.0.1 --server.port "${DASHBOARD_PORT:-8501}" &
 PIDS+=($!)
 
 wait

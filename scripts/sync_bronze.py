@@ -1,4 +1,4 @@
-"""Upload ~/.claude/projects/**/*.jsonl to the bronze container. Safe to re-run.
+"""Upload $CLAUDE_PROJECTS_DIR (default ~/.claude/projects)/**/*.jsonl to the bronze container. Safe to re-run.
 
 Object stores have no rsync, so the rule is ours: upload a file only when the blob
 is missing or its size differs (transcripts are append-only, so a changed file grows).
@@ -6,9 +6,9 @@ is missing or its size differs (transcripts are append-only, so a changed file g
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-from common import blob_service
+from common import CLAUDE_PROJECTS_DIR, blob_service
 
-SOURCE = Path.home() / ".claude" / "projects"
+SOURCE = CLAUDE_PROJECTS_DIR
 # Transcripts rsynced from other machines: data/bronze_remote/<machine>/<project>/*.jsonl
 # land in blob remote/<machine>/<project>/... so silver can tag rows with `machine`.
 REMOTE = Path(__file__).resolve().parent.parent / "data" / "bronze_remote"

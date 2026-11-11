@@ -532,7 +532,7 @@ with mcp_tab:
 with activity_tab:
     heat = q("select * from main.activity_heatmap")
     st.subheader("When you work: messages by weekday and hour")
-    st.caption("Main-conversation messages only, in Europe/London time (change with the dbt var display_timezone).")
+    st.caption("Main-conversation messages only, in the timezone set by TIMEZONE in .env (default UTC).")
     show(alt.Chart(heat).mark_rect().encode(
         x=alt.X("hour:O", title="hour of day"), y=alt.Y("weekday:O", sort=WEEKDAYS, title=None),
         color=alt.Color("messages:Q", scale=alt.Scale(scheme="viridis"), title="messages"),

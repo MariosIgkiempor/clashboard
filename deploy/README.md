@@ -1,26 +1,31 @@
-# Running Clashboard on hefty
+# Running Clashboard as an always-on service (macOS, optional)
 
-## One-time (on hefty)
+Not needed to try the app: `scripts/start.sh` is enough. Use this when you want it running on a
+home server / always-on Mac, reachable from your other devices.
+
 ```bash
-cd ~/Programming/personal/clashboard && git pull   # needs this branch merged
-scripts/start.sh --bootstrap    # first run only: builds the pipeline from local ~/.claude + any rsynced data; Ctrl-C when the UIs are up
-deploy/install-hefty.sh         # launchd service + `tailscale serve`
+scripts/start.sh --bootstrap    # first run only: builds the pipeline; Ctrl-C once the UIs are up
+deploy/install-service.sh       # launchd service (+ `tailscale serve` if Tailscale is installed)
+deploy/install-service.sh --no-tailscale   # service only
 ```
-Needs Docker (OrbStack is fine), Tailscale with HTTPS certificates enabled for the tailnet (admin console > DNS), and Remote Login (ssh) enabled on hefty.
 
-URLs from the MacBook: `https://hefty.sheep-corn.ts.net:8501` (Streamlit), `https://hefty.sheep-corn.ts.net:3000` (Dagster).
+Needs Docker (OrbStack is fine) when `STORAGE_MODE=azurite`. For Tailscale HTTPS, enable HTTPS certificates for your tailnet
+(admin console > DNS). The UIs are then at `https://<this-host>.<tailnet>.ts.net:8501` (dashboard) and `:3000` (Dagster).
+Without Tailscale, use an ssh tunnel: `ssh -L 8501:127.0.0.1:8501 user@host`.
 
-## Syncing from the MacBook Pro (automatic, hefty pulls)
-`deploy/install-hefty.sh` installs a launchd job (`com.clashboard.pull`) that runs `scripts/pull_from_macbook.sh` every 15 minutes
-(log: `~/Library/Logs/clashboard/pull.log`). If the MacBook is asleep or offline the run is skipped and the next one catches up.
+Logs: `~/Library/Logs/clashboard/stack.log`. Stop: `launchctl bootout gui/$UID/com.clashboard.stack`.
 
-One-time setup on the **MacBook**: System Settings > General > Sharing > **Remote Login** ON, then authorize hefty's key:
-```bash
-# on hefty (generate a key first if `ls ~/.ssh/id_ed25519.pub` is missing: ssh-keygen -t ed25519)
-ssh-copy-id mario@marios-macbook-pro        # then check: ssh mario@marios-macbook-pro true
-```
-Override with `MACBOOK_HOST`, `MACBOOK_USER`, `MACBOOK_MACHINE` in `.env`. Files land in `data/bronze_remote/macbook-pro/`;
-the `new_transcripts` Dagster sensor refreshes within ~5 min. MacBook rows show as `machine = macbook-pro`; hefty's own sessions are `local`.
-Note: the MacBook only needs to be awake sometimes; Claude Code keeps transcripts ~30 days, so a few days offline loses nothing.
+## Combining several machines
 
-Optional one-time history seed: Claude Code deletes transcripts after ~30 days, so older history only lives in the MacBook's `data/azurite/`. Copy the MacBook's `data/bronze/` (if populated) or `data/azurite/` to hefty before the first bootstrap if you want it.
+Claude Code only writes transcripts on the machine you use it on. To see everything in one dashboard, run Clashboard on one
+machine and have it **pull** transcripts from the others over ssh (repeat per extra machine by running `scripts/pull_remote.sh`
+with different env, or rsync them into `data/bronze_remote/<name>/` however you like).
+
+1. On the remote machine: enable ssh (macOS: System Settings > General > Sharing > Remote Login).
+2. On the Clashboard host: `ssh-copy-id <user>@<host>` (create a key first with `ssh-keygen -t ed25519` if needed) and check `ssh <user>@<host> true`.
+3. Set in `.env`: `REMOTE_HOST`, `REMOTE_USER`, `REMOTE_MACHINE` (the label shown in the dashboard).
+4. `deploy/install-service.sh` then pulls every 15 minutes (log: `~/Library/Logs/clashboard/pull.log`); or run `scripts/pull_remote.sh` by hand.
+
+Files land in `data/bronze_remote/<REMOTE_MACHINE>/`, and the `new_transcripts` Dagster sensor refreshes within ~5 minutes.
+Rows from the remote show as `machine = <REMOTE_MACHINE>`; this machine's own are `local`. If the remote is asleep the run is
+skipped and the next one catches up. Claude Code prunes transcripts after ~30 days, so a few days offline loses nothing.

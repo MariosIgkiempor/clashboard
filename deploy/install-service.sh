@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
-# One-time setup on hefty: launchd service for the whole stack + tailnet-only HTTPS exposure.
-#   Streamlit -> https://<hefty>.<tailnet>.ts.net:8501     Dagster -> https://<hefty>.<tailnet>.ts.net:3000
-# Both servers bind 127.0.0.1; `tailscale serve` is the only way in.
+# macOS: run the whole stack as a launchd service (starts at login, restarts on crash).
+#   - If REMOTE_HOST is set in .env, also installs a job that pulls that machine's transcripts every 15 min.
+#   - If `tailscale` is installed, exposes the UIs on your tailnet over HTTPS (skip with --no-tailscale).
+# Both servers bind 127.0.0.1; `tailscale serve` (or an ssh tunnel) is the only way in from other machines.
+#   deploy/install-service.sh [--no-tailscale]
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 LABEL=com.clashboard.stack
@@ -9,6 +11,7 @@ PLIST="$HOME/Library/LaunchAgents/$LABEL.plist"
 
 command -v uv >/dev/null || brew install uv
 [[ -f "$ROOT/.env" ]] || { echo ".env missing in $ROOT" >&2; exit 1; }
+set -a; source "$ROOT/.env"; set +a
 mkdir -p "$ROOT/data/bronze_remote" "$HOME/Library/Logs/clashboard"
 
 cat > "$PLIST" <<PL
@@ -31,7 +34,8 @@ PL
 launchctl bootout "gui/$UID/$LABEL" 2>/dev/null || true
 launchctl bootstrap "gui/$UID" "$PLIST"
 
-# Pull MacBook transcripts every 15 minutes (silently skipped while the MacBook is asleep/offline).
+if [[ -n "${REMOTE_HOST:-}" ]]; then
+# Pull remote transcripts every 15 minutes (silently skipped while the remote is asleep/offline).
 PULL_LABEL=com.clashboard.pull
 PULL_PLIST="$HOME/Library/LaunchAgents/$PULL_LABEL.plist"
 cat > "$PULL_PLIST" <<PL
@@ -39,7 +43,7 @@ cat > "$PULL_PLIST" <<PL
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict>
   <key>Label</key><string>$PULL_LABEL</string>
-  <key>ProgramArguments</key><array><string>$ROOT/scripts/pull_from_macbook.sh</string></array>
+  <key>ProgramArguments</key><array><string>$ROOT/scripts/pull_remote.sh</string></array>
   <key>StartInterval</key><integer>900</integer>
   <key>RunAtLoad</key><true/>
   <key>StandardOutPath</key><string>$HOME/Library/Logs/clashboard/pull.log</string>
@@ -48,8 +52,11 @@ cat > "$PULL_PLIST" <<PL
 PL
 launchctl bootout "gui/$UID/$PULL_LABEL" 2>/dev/null || true
 launchctl bootstrap "gui/$UID" "$PULL_PLIST"
+fi
 
-tailscale serve --bg --https=8501 http://127.0.0.1:8501
-tailscale serve --bg --https=3000 http://127.0.0.1:3000
-tailscale serve status
+if [[ "${1:-}" != "--no-tailscale" ]] && command -v tailscale >/dev/null; then
+  tailscale serve --bg --https="${DASHBOARD_PORT:-8501}" "http://127.0.0.1:${DASHBOARD_PORT:-8501}"
+  tailscale serve --bg --https="${DAGSTER_PORT:-3000}" "http://127.0.0.1:${DAGSTER_PORT:-3000}"
+  tailscale serve status
+fi
 echo "logs: ~/Library/Logs/clashboard/stack.log   (first start needs: scripts/start.sh --bootstrap once, see deploy/README.md)"

@@ -11,7 +11,7 @@ from pathlib import Path
 import duckdb
 
 sys.path.insert(0, str(Path(__file__).parent))
-from common import blob_service  # noqa: E402  (also loads .env)
+from common import CLAUDE_PROJECTS_DIR, blob_service  # noqa: E402  (also loads .env)
 
 ROOT = Path(__file__).resolve().parent.parent
 os.chdir(ROOT)
@@ -34,11 +34,11 @@ except Exception as e:  # noqa: BLE001
     sys.exit(1)
 
 # 2. bronze: same file count locally and in Azurite
-source = Path.home() / ".claude" / "projects"
+source = CLAUDE_PROJECTS_DIR
 remote = Path(__file__).resolve().parent.parent / "data" / "bronze_remote"
 local_files = sum(1 for _ in source.rglob("*.jsonl")) + sum(1 for _ in remote.rglob("*.jsonl"))
 blob_files = sum(1 for _ in svc.get_container_client("bronze").list_blobs())
-check("bronze file count", local_files == blob_files, f"~/.claude+remote={local_files} azurite={blob_files}")
+check("bronze file count", local_files == blob_files, f"local+remote={local_files} azurite={blob_files}")
 
 con = duckdb.connect(str(ROOT / "data" / "clashboard.duckdb"), read_only=True)
 con.execute("INSTALL azure; LOAD azure;")
